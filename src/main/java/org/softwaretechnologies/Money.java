@@ -2,7 +2,6 @@ package org.softwaretechnologies;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Random;
 
 import static java.lang.Integer.MAX_VALUE;
 
@@ -26,14 +25,19 @@ public class Money {
      */
     @Override
     public boolean equals(Object o) {
-        // TODO: реализуйте вышеуказанную функцию
-
-        return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Money money = (Money) o;
+        if (type != money.type) return false;
+        if (amount == null || money.amount == null) return amount == money.amount;
+        BigDecimal thisScaled = amount.setScale(4, RoundingMode.HALF_UP);
+        BigDecimal otherScaled = money.amount.setScale(4, RoundingMode.HALF_UP);
+        return thisScaled.equals(otherScaled);
     }
 
     /**
      * Формула:
-     * (Если amount null 10000, иначе количество денег окрукленные до 4х знаков * 10000) + :
+     * (Если amount null 10000, иначе количество денег округленные до 4х знаков * 10000) + :
      * если USD , то 1
      * если EURO, то 2
      * если RUB, то 3
@@ -48,11 +52,22 @@ public class Money {
      */
     @Override
     public int hashCode() {
-        // TODO: реализуйте вышеуказанную функцию
-
-
-        Random random = new Random();
-        return random.nextInt();
+        int typeHash = switch (type) {
+            case USD -> 1;
+            case EURO -> 2;
+            case RUB -> 3;
+            case KRONA -> 4;
+            default -> 5; // Если type == null
+        };
+        if (amount == null) {
+            return 10000 + typeHash;
+        }
+        BigDecimal scaledAmount = amount.setScale(4, RoundingMode.HALF_UP);
+        long scaledValue = scaledAmount.multiply(BigDecimal.valueOf(10000)).longValue();
+        if (scaledValue >= (long) MAX_VALUE - 5) {
+            return MAX_VALUE;
+        }
+        return (int) scaledValue + typeHash;
     }
 
     /**
@@ -60,9 +75,7 @@ public class Money {
      * Тип_ВАЛЮТЫ: количество.XXXX
      * Тип_валюты: USD, EURO, RUB или KRONA
      * количество.XXXX - округленный amount до 4х знаков.
-     * Округление по правилу: если >= 5, то в большую сторону, интаче - в меньшую
-     * BigDecimal scale = amount.setScale(4, RoundingMode.HALF_UP);
-     * <p>
+     * Округление по правилу: если >= 5, то в большую сторону, иначе - в меньшую
      * Если тип валюты null, то вернуть:
      * null: количество.XXXX
      * Если количество денег null, то вернуть:
@@ -74,9 +87,9 @@ public class Money {
      */
     @Override
     public String toString() {
-        // TODO: реализуйте вышеуказанную функцию
-        String str = type.toString()+": "+amount.setScale(4, RoundingMode.HALF_UP).toString();
-        return str;
+        String typeString = (type == null) ? "null" : type.toString();
+        String amountString = (amount == null) ? "null" : amount.setScale(4, RoundingMode.HALF_UP).toString();
+        return typeString + ": " + amountString;
     }
 
     public BigDecimal getAmount() {
@@ -95,3 +108,4 @@ public class Money {
         System.out.println(money.equals(money1));
     }
 }
+
