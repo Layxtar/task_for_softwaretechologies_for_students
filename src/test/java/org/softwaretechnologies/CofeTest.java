@@ -12,7 +12,7 @@ public class CofeTest {
     }
     @Test
     void costCofeWithMilkSugar() {
-        CofeInterface cofe =new Sugar(new MilkCofe(new Cofe()));
+        CofeInterface cofe =new SugarCofe(new MilkCofe(new Cofe()));
         assertEquals(cofe.getCost(),80);
 
     }

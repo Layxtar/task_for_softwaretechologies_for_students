@@ -2,10 +2,13 @@ package org.softwaretechnologies;
 
 public interface CofeInterface {
     /**
-     * Создайте два метода:
-     * для возврата стоимости int getCost();
-     * для описания кофе String description();
+     * Возвращает стоимость кофе.
      */
     int getCost();
+
+    /**
+     * Возвращает описание кофе.
+     */
     String description();
 }
+
